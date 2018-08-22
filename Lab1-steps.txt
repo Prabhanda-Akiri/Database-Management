@@ -1,0 +1,126 @@
+create database company;
+
+use company;
+
+create table departments(
+department_id decimal(4,0) primary key,
+department_name varchar(30),
+manager_id decimal(6,0),
+location_id decimal(4,0)
+);
+
+
+create table jobs(
+job_id varchar(10) primary key,
+job_title varchar(35),
+min_salary decimal(6,0),
+max_salary decimal(6,0)
+);
+
+
+create table employee(
+id int primary key auto_increment,
+first_name varchar(20),
+last_name varchar(20),
+email varchar(20),
+phone int,
+hire_date date,
+job_id varchar(10),
+salary decimal,
+commission decimal,
+manager_id decimal(6,0),
+department_id decimal(4,0),
+employee_id int,
+foreign key(job_id) references jobs(job_id),
+foreign key(department_id) references departments(department_id)
+);
+
+
+//insert values in departments table
+
+insert into departments values (23,'Information Technology',43,67),(45,'Computer Science',35,78),(120,'Electrical',67,98),(67,'Mechanical',54,56),(42,'Civil',90,45);
+
+//insert values in employee table
+
+insert into employee(first_name,last_name,email,manager_id,department_id) values ('sahithi','akiri','sa@gmail.com',23,45),('sanju','akiri','su@gmail.com',24,67),('jamithra','chappa','jam@gmail.com',12,120),('pavani','kolluru','pav@gmail.com',16,120),('sravani','mothey','srav@gmail.com',19,42);
+
+//renaming table names
+
+alter table departments rename to dept;
+alter table employee rename to emp;
+
+
+//change emp phone and salary dept=120
+
+alter table emp modify column phone varchar(20);
+update emp set phone='not available',salary=50000 where department_id=120;
+
+
+
+//5th qn
+
+1.
+alter table emp Change employee_id emp_id int; 
+
+2.
+alter table emp add age int after phone;
+
+3.
+alter table emp modify column salary double;
+
+4.
+alter table emp drop age;
+
+5.
+alter table emp add primary key(emp_id);
+
+
+
+//6th question combo primary key
+
+>alter table emp drop primary key;
+
+>update emp set emp_id=45 where emp_id is null;
+>alter table emp modify emp_id int(11) not null default 45;
+
+> update emp set email='sa@gmail.com' where email is null;
+>alter table emp modify email varchar(20) not null default 'sa@gmail.com';
+
+>alter table emp add primary key(emp_id,email);               
+
+
+//7th questin
+
+>alter table emp drop primary key;
+
+
+//8th qn
+
+>alter table emp add foreign key(job_id) references jobs(job_id);
+
+//9th qn
+
+>alter table emp add constraint fk_job_id foreign key(job_id) references jobs(job_id);
+
+//10th qn
+
+> alter table emp drop foreign key fk_job_id;
+
+
+***
+additional commands
+
+to drop table:
+>drop table employee;
+
+to add column:
+>alter table employee add column_name datatype;
+
+to alter column:
+>alter table employee modify column column_name datatype;
+
+to drop column:
+>alter table employee drop column_name;
+
+
+***
