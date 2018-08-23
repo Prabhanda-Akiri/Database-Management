@@ -1,0 +1,185 @@
+
+
+create database company2;
+
+use company2;
+
+create table employee(
+fname varchar(10),
+minit varchar(2),
+lname varchar(10),
+ssn varchar(10) primary key,
+bdate date,
+address varchar(40),
+sex varchar(1),
+salary decimal(6,0),
+super_ssn varchar(10),
+dno int 
+);
+
+create table department(
+dname varchar(20),
+dnumber int,
+mgr_ssn varchar(10),
+mgr_start_date date
+);
+
+alter table department add primary key(dnumber);
+
+alter table employee add constraint foreign key(dno) references department(dnumber);
+
+
+insert into department values
+('Research',5,'333445555','1988-05-22'),
+('Administration',4,'987654321','1995-01-01'),
+('Headquarters',1,'888665555','1981-06-19')
+;
+
+
+insert into employee values
+('john','b','smith','123456789','1965-01-09','Foundren,houston','M',30000,'333445555',5),
+('franklin','t','wong','333445555','1955-12-08','voss,houston','M',40000,'888665555',5),
+('alika','j','zelaya','999887777','1968-01-19','castle,spring','F',25000,'987654321',4),
+('jennifer','s','wallace','987654321','1941-06-20','berry,bellaire','F',43000,'888665555',4),
+('ramesh','k','narayan','666884444','1962-09-15','oak,humble','M',38000,'333445555',5),
+('joyce','a','english','453453453','1972-07-31','rice,houston','F',25000,'333445555',5),
+('ahmad','v','jabbar','987987987','1969-03-29','dallas,houston','M',25000,'987654321',4),
+('james','e','borg','888665555','1937-11-10','stone,houston','M',55000,null,1)
+;
+
+// 1st qn
+
+>
+select e.fname,e.minit,e.lname 
+from employee as e,department as d 
+where e.dno=d.dnumber and d.dname='Administration';
+
+//2nd qn
+
+>select e.salary 
+from employee as e,department as d 
+where e.dno=d.dnumber and d.dname='Research';
+
+>select sum(e.salary),max(e.salary),min(e.salary),avg(e.salary) 
+from employee as e,department as d 
+where e.dno=d.dnumber and d.dname='Research';
+
+//3rd qn
+
+>select *
+from employee as e,department as d
+where e.dno=d.dnumber and d.dname='Administration';
+
+>select count(*)
+from employee as e,department as d
+where e.dno=d.dnumber and d.dname='Administration';
+
+//4th qn
+
+create table works_on(
+essn varchar(10),
+pno int,
+hours decimal(4,0)
+);
+
+create table project(
+pname varchar(20),
+pnumber int primary key,
+plocation varchar(15)
+);
+
+>
+insert into works_on values
+('123456789',1,32.5),
+('123456789',2,7.5),
+('666884444',3,40.0),
+('453453453',1,20.0),
+('453453453',2,20.0),
+('333445555',2,10.0),
+('333445555',3,10.0),
+('333445555',10,10.0),
+('333445555',20,10.0),
+('999887777',30,30.0),
+('999887777',10,10.0),
+('987987987',10,35.0),
+('987987987',30,5.0),
+('987654321',30,20.0),
+('987654321',20,15.0),
+('888665555',20,null);
+
+>
+
+insert into project values
+('productx',1,'bellaire',5),
+('producty',2,'sugarland',5),
+('productz',3,'houston',5),
+('computerization',10,'stafford',4),
+('reorganization',20,'houston',1),
+('newbenefits',30,'stafford',4)
+;
+
+
+//4th qn
+
+>
+
+select p.pnumber,p.pname,count(w.essn) 
+from project as p,works_on as w 
+where w.pno=p.pnumber
+group by w.pno;
+
+//5th qn
+
+>
+select p.pnumber,p.pname,p.plocation,count(w.essn)
+from project as p,works_on as w
+where p.dnum=5 and 
+w.pno=p.pnumber
+group by w.pno;
+
+
+//6th qn
+
+> 
+select p.pnumber,p.dnum,e.lname,e.address
+from project as p,employee as e,department
+where p.plocation='houston' and
+p.dnum=department.dnumber and
+department.mgr_ssn=e.ssn
+;
+
+
+//7th qn
+
+>
+select e.fname,e.minit,e.lname,p.pname,e.dno
+from employee as e,project as p,works_on as w
+where w.pno=p.pnumber and
+e.ssn=w.essn
+order by e.dno,e.fname,e.lname
+;
+
+//8th qn
+
+>
+select * from employee where super_ssn is null;
+
+//9th qn
+
+>
+select *  
+from employee 
+where employee.super_ssn in 
+(select employee.ssn  
+from employee where employee.super_ssn='888665555')
+;
+
+
+//10th qn
+>
+select d.dname,e.fname,e.lname,e.salary
+from department as d,employee as e
+where
+d.mgr_ssn=e.ssn;
+
+//11th qn
