@@ -1,5 +1,4 @@
 
-
 create database company2;
 
 use company2;
@@ -79,7 +78,7 @@ where e.dno=d.dnumber and d.dname='Administration';
 create table works_on(
 essn varchar(10),
 pno int,
-hours decimal(4,0)
+hours decimal(6,2)
 );
 
 create table project(
@@ -183,3 +182,108 @@ where
 d.mgr_ssn=e.ssn;
 
 //11th qn
+>
+select e.fname,e.lname,e.salary,d.dname,e1.fname,e1.lname
+from employee as e,department as d,employee as e1
+where e.dno=d.dnumber and
+e1.ssn in
+(select e.super_ssn from employee) and
+d.dname='Research'
+;
+
+//12th qn
+
+>
+select p.pname,d.dname,count(w.essn),sum(w.hours)
+from project as p,department as d,works_on as w
+where p.dnum=d.dnumber and
+w.pno=p.pnumber 
+group by w.pno;
+
+//13th qn
+
+>
+select p.pname,d.dname,count(w.essn),sum(w.hours)
+from project as p,department as d,works_on as w
+where p.dnum=d.dnumber and
+w.pno=p.pnumber
+group by w.pno
+having count(w.essn)>1;
+
+//14th qn
+
+select e.fname,e.lname,w.pno,p.dnum
+from employee as e,project as p,works_on as w
+where p.dnum=5 and 
+p.pnumber=w.pno and
+e.ssn=w.essn
+;
+
+//15th qn
+>
+select w.essn,e.fname,e.lname,p.dnum,sum(w.hours)
+from employee as e,project as p,works_on as w
+where p.dnum=5 and
+e.ssn=w.essn and
+p.pnumber=w.pno and
+p.pname='productx'
+group by w.essn
+having sum(w.hours)>10;
+
+//16th qn
+>
+create table depndent(
+essn varchar(10),
+dependent_name varchar(20),
+sex varchar(1),
+bdate date,
+relationship varchar(10)
+);
+
+>
+insert into dependent values
+('333445555','alice','F','1986-04-05','daughter'),
+('333445555','theodore','M','1983-10-25','son'),
+('333445555','joy','F','1958-05-03','spouse'),
+('987654321','abner','M','1942-02-28','spouse'),
+('123456789','michael','M','1988-01-04','son'),
+('123456789','alice','F','1988-12-30','daughter'),
+('123456789','michael','M','1967-05-05','spouse');
+
+>
+select e.fname,e.lname,de.*
+from employee as e,dependent as de
+where de.relationship in ('son','daughter') and
+e.ssn=de.essn;
+
+
+//17th qn
+
+>
+select e.* ,e1.fname,e1.lname
+from employee as e,employee as e1
+where 
+e1.fname='franklin' and
+e1.lname='wong' and
+e.super_ssn=e1.ssn
+;
+
+//18th qn
+>
+select p.pname,p.pnumber,sum(w.hours)
+from project as p,works_on as w
+where p.pnumber=w.pno 
+group by w.pno;
+
+//19th qn
+>
+select e.salary
+from employee as e
+where e.sex='F'
+;
+
+>
+select avg(e.salary)
+from employee as e
+where e.sex='F'
+;
