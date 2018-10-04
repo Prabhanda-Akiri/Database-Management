@@ -244,43 +244,70 @@ insert into procedures values
 //qn 1
 
 >
-select p.name,ph.name,ph1.name
-from physician as ph,patient as p,physician as ph1,appointment as ap
+select p.name as "Patient Name",ph.name as "Physician Name"
+from physician as ph,patient as p
 where 
 p.pcp=ph.empid and
-ph1.empid not in(select head from department) and
-ap.patient=p.ssn and
-ap.physician=ph1.empid
+ph.empid not in(select head from department)
 ;
 
 //qn 2
 
 >
-select p.name,n.name,ph.name
+select p.name as "PAtient Name",
+n.name as "Nurse Name",
+ph.name as "Physician Name"
 from patient as p,nurse as n,physician as ph,undergoes as ud
 where ud.patient in 
 (select ud.patient from undergoes as ud group by ud.patient having count(*)>1) and
 ud.patient=p.ssn and
 n.empid=ud.astnurse and
+n.registered='t' and
 ph.empid=ud.physician
 ;
 
 //qn 3
 >
-select p.name,pr.name,pr.cost,ph.name
-from undergoes as ud,patient as p,procedures as pr,physician as ph
-where ud.proced=pr.code and
-pr.code in
-(select pr.code from procedures as pr where pr.cost>5000) and
+select p.name as "Patient Name",
+pr.name as "Procedure Name",
+pr.cost as "Procedure Cost",
+ph.name as "Physician Name"
+from undergoes ud,patient p,procedures pr,physician ph
+where pr.code in
+(select pr1.code from procedures as pr1 where pr1.cost>5000) and
+ud.proced=pr.code and
 ud.patient=p.ssn and ud.physician=ph.empid;
 
-//qn 5
->select ph.name,pr.name
-from physician as ph,procedures as pr,trained as tr,undergoes as ud
+
+//qn 4
+>
+select ph.name as "Physician",
+ph.position as "Position",
+ud.date as "Procedure date",
+tr.cexp as "Expiry date",
+p.name as "Patient",
+pr.name as "Procedure"
+from physician ph,trained tr,undergoes ud,patient p,procedures pr 
 where
-ph.empid=ud.physician and
-ph.empid not in(select physician from trained where treatment in
-(select procedure from undergoes where ))
+ud.physician in 
+(select physician from trained) and
+ud.physician=tr.physician and
+ud.date>tr.cexp and
+ud.physician=ph.empid and
+ud.patient=p.ssn and
+ud.proced=pr.code and
+pr.code=tr.treatment
+;
 
 
+//qn 5
 
+>
+select ph.name as "Physician"
+from physician ph
+where
+ph.empid in (select physician from undergoes ud where
+not exists
+(select * from trained
+where treatment=ud.proced and physician=ud.physician))
+;
