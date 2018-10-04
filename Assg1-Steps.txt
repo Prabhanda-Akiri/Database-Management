@@ -1,0 +1,286 @@
+>sudo mysql -p -u root
+>create database hospital;
+>use hospital;
+
+//1st qn
+>
+create table nurse(
+empid int primary key,
+name varchar(15),
+position varchar(15),
+registered varchar(1),
+ssn varchar(10)
+);
+
+>
+insert into nurse values
+(101,'carla espinosa','head nurse','t',111111110),
+(102,'laverne roberts','nurse','t',222222220),
+(103,'paul flowers','nurse','f',333333330);
+
+>
+select * from nurse 
+where registered='f';
+
+//
+create table physician(
+empid int primary key,
+name varchar(20),
+position varchar(30),
+ssn varchar(10)
+);
+
+>
+insert into physician values
+(1,'John Dorian','Staff Internist','111111111'),
+(2,'Elliot Reid','Attending Physician','222222222'),
+(3,'Christopher Turk','Surgical Attending Physician','333333333'),
+(4,'Percival Cox','Senior Attending Physician','444444444'),
+(5,'Bob Kelso','Head Chief of Medicine','555555555'),
+(6,'Todd Quinlan','Surgical Attending Physician','666666666'),
+(7,'John Wen','Surgical Attending Physician','777777777'),
+(8,'Keith Dudemeister','MD Resident','888888888'),
+(9,'Molly Clock','Attending Psychiatrist','999999999');
+
+>
+create table department(
+depid int primary key,
+name varchar(20),
+head int
+);
+
+>
+alter table department add foreign key(head) references physician(empid);
+
+>insert into department values
+( 1,'General Medicine',4),
+(2,'Surgery',7),
+( 3,'Psychiatry',9);
+
+//2nd qn
+>
+select p.name,d.name 
+from physician as p,department as d
+where d.head=p.empid;
+
+//
+>
+create table room(
+rno int primary key,
+rtype varchar(10),
+bfloor int,
+bcode int,
+unavailable varchar(1)
+);
+
+>
+insert into room values
+(101,'Single',1,1,'f'),
+(102,'Single',2,1,'f'),
+(212,'Single',3,2,'f')
+;
+
+>
+create table block(
+bfloor int,
+bcode int
+);
+
+>
+insert into block values
+(1,1),
+(1,2),
+(2,1),
+(2,2),
+(3,1),
+(3,2);
+
+//3rd qn
+>
+select bfloor,bcode,rno 
+from room 
+where rno=212;
+
+//4th qn
+>
+select count(*)
+from room 
+where unavailable='f'
+;
+
+//
+
+>
+create table patient(
+ssn varchar(10) primary key,
+name varchar(20),
+address varchar(30),
+phone varchar(10),
+insid varchar(8),
+pcp int,
+foreign key(pcp) references physician(empid)
+);
+
+>
+insert into patient values
+('100000001','John Smith','42 Foobar Lane','555-0256','68476213',1),
+('100000002','Grace Ritchie','37 Snafu Drive','555-0512','36546321',2),
+('100000003','Random J. Patient','101 Omgbbq Street','555-1204','65465421',2),
+('100000004','Dennis Doe','1100 Foobaz Avenue','555-2048','68421879',3);
+
+//5th qn
+>
+select p.name,ph.name
+from patient as p,physician as ph
+where p.pcp=ph.empid;
+
+//
+>
+create table appointment(
+appid varchar(8) primary key,
+patient varchar(10),
+prepnurse int,
+physician int,
+sttime datetime,
+edtime datetime,
+exroom varchar(1)
+);
+
+>
+insert into appointment values
+('13216584','100000001',101,1,'2008-04-24 10:00:00','2008-04-24 11:00:00','A'),
+('59871321','100000004',NULL,4,'2008-04-26 10:00:00','2008-04-26 11:00:00','C'),
+('69879231','100000003',103,2,'2008-04-26 11:00:00','2008-04-26 12:00:00','C'),
+('76983231','100000001',NULL,3,'2008-04-26 12:00:00','2008-04-26 13:00:00','C')
+;
+
+//6th qn
+>
+select p.name,ap.patient,count(ap.physician)
+from patient as p,appointment as ap
+where ap.patient=p.ssn
+group by ap.patient;
+
+//7th qn
+>
+select n.empid,n.name,ap.exroom
+from nurse as n,appointment as ap
+where n.empid=ap.prepnurse
+;
+
+//8th qn
+>
+select p.ssn,p.name,ph.name,ap.prepnurse,ap.exroom
+from patient as p,physician as ph,appointment as ap
+where ap.sttime='2008-04-26 10:00:00' and 
+ap.patient=p.ssn and
+ph.empid=ap.physician
+;
+
+//9th qn
+
+select p.name,ph.name 
+from patient as p,physician as ph
+where p.patient in
+(select patient from appointment 
+where prepnurse is null)
+and
+ph.empid in
+(select physician from appointment 
+where prepnurse is null);
+
+
+
+
+/////assignment
+
+>create table undergoes(
+patient varchar(10),
+proced int,
+stay int,
+date datetime,
+physician int,
+astnurse int
+);
+
+>
+insert into undergoes values
+('100000001',6,3215,'2008-05-02 00:00:00',3,101),
+('100000001',7,3217,'2008-05-10 00:00:00',7,101),
+('100000004',4,3217,'2008-05-13 00:00:00',3,103);
+
+>
+create table trained(
+physician int,
+treatment int,
+cjoindt date,
+cexp date
+);
+
+>
+insert into trained values
+(3,1,'2008-01-01','2008-12-31'),
+(3,2,'2008-01-01','2008-12-31'),
+(6,2,'2008-01-01','2008-12-31'),
+(6,5,'2007-01-01','2007-12-31'),
+(7,1,'2008-01-01','2008-12-31');
+
+>
+create table procedures(
+code int primary key,
+name varchar(40),
+cost int
+);
+
+>
+insert into procedures values
+(1,'Reverse Rhinopodoplasty',1500),
+(2,'Obtuse Pyloric Recombobulation',3750),
+(3,'Folded Demiophtalmectomy',4500),
+(4,'Complete Walletectomy',10000),
+(5,'Obfuscated Dermogastrotomy',4899)
+;
+
+//qn 1
+
+>
+select p.name,ph.name,ph1.name
+from physician as ph,patient as p,physician as ph1,appointment as ap
+where 
+p.pcp=ph.empid and
+ph1.empid not in(select head from department) and
+ap.patient=p.ssn and
+ap.physician=ph1.empid
+;
+
+//qn 2
+
+>
+select p.name,n.name,ph.name
+from patient as p,nurse as n,physician as ph,undergoes as ud
+where ud.patient in 
+(select ud.patient from undergoes as ud group by ud.patient having count(*)>1) and
+ud.patient=p.ssn and
+n.empid=ud.astnurse and
+ph.empid=ud.physician
+;
+
+//qn 3
+>
+select p.name,pr.name,pr.cost,ph.name
+from undergoes as ud,patient as p,procedures as pr,physician as ph
+where ud.proced=pr.code and
+pr.code in
+(select pr.code from procedures as pr where pr.cost>5000) and
+ud.patient=p.ssn and ud.physician=ph.empid;
+
+//qn 5
+>select ph.name,pr.name
+from physician as ph,procedures as pr,trained as tr,undergoes as ud
+where
+ph.empid=ud.physician and
+ph.empid not in(select physician from trained where treatment in
+(select procedure from undergoes where ))
+
+
+
